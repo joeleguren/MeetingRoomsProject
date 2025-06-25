@@ -21,14 +21,20 @@ public class MeetingRoomManager {
 
         reservation.setReservationId(generateReservationID());
 
+        // Comprobamos si la reserva es valida
         // if (EmployeeDAO.getEmployeeByDNI(reservation.getDni()) == null) {
         //      return null;
         // }
 
+        // Comprobmos si la sala existe y si se puede reservar
         // if (roomDAO.getRoomById(roomId) == null || reservationDAO.canReservate(roomId, reservationDate, startTime, endTime)) {
         //     return null;
         // }
         return reservationDAO.addReservation(reservation);
+    }
+
+    public boolean cancelReservation(String reservationId) throws SQLException {
+        return reservationDAO.cancelReservation(reservationId);
     }
 
     private String generateReservationID() {
