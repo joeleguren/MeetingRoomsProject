@@ -22,6 +22,15 @@ public class Reservation {
         this.endTime = endTime;
     }
 
+    public Reservation(int roomId, String dni, LocalDate reservationDate, LocalTime startTime, LocalTime endTime) {
+        this.reservationId = "";
+        this.roomId = roomId;
+        this.dni = dni;
+        this.reservationDate = reservationDate;
+        this.startTime = startTime;
+        this.endTime = endTime;
+    }
+
     public Reservation(Reservation reservation) {
         this.reservationId = reservation.reservationId;
         this.roomId = reservation.roomId;

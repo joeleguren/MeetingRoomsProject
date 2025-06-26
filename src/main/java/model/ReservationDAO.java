@@ -23,9 +23,9 @@ public class ReservationDAO {
             ps.setString(1, reservation.getReservationId());
             ps.setInt(2, reservation.getRoomId());
             ps.setString(3, reservation.getDni());
-            ps.setDate(4, java.sql.Date.valueOf(reservation.getReservationDate()));
-            ps.setTime(5, java.sql.Time.valueOf(reservation.getStartTime()));
-            ps.setTime(6, java.sql.Time.valueOf(reservation.getEndTime()));
+            ps.setDate(4, Date.valueOf(reservation.getReservationDate()));
+            ps.setTime(5, Time.valueOf(reservation.getStartTime()));
+            ps.setTime(6, Time.valueOf(reservation.getEndTime()));
 
             if (ps.executeUpdate() > 0) {
                 reservationId = reservation.getReservationId();
@@ -90,7 +90,7 @@ public class ReservationDAO {
      * @throws SQLException Si ocurre un error al acceder a la base de datos.
      */
     private boolean canReservate(Reservation reservation) throws SQLException {
-        boolean canReserve = true;
+        boolean canReserve = true; // Por defecto se puede reservar
 
         // Comprobar que la fecha de reserva es futura y no es hoy
         if (!reservation.getReservationDate().isAfter(LocalDate.now())) {

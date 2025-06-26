@@ -21,18 +21,24 @@ public class MeetingRoomManager {
 
         reservation.setReservationId(generateReservationID());
 
-        // Comprobamos si la reserva es valida
+        // Comprobamos si el empleado existe
         // if (EmployeeDAO.getEmployeeByDNI(reservation.getDni()) == null) {
         //      return null;
         // }
 
-        // Comprobmos si la sala existe y si se puede reservar
+        // Comprobamos si la sala existe y si se puede reservar
         // if (roomDAO.getRoomById(roomId) == null || reservationDAO.canReservate(roomId, reservationDate, startTime, endTime)) {
         //     return null;
         // }
         return reservationDAO.addReservation(reservation);
     }
 
+    /**
+     * Cancela una reserva.
+     * @param reservationId El ID de la reserva a cancelar.
+     * @return true si se ha cancelado correctamente, false si no se puede cancelar (por ejemplo, si la reserva no existe o es hoy).
+     * @throws SQLException Si ocurre un error al acceder a la base de datos.
+     */
     public boolean cancelReservation(String reservationId) throws SQLException {
         return reservationDAO.cancelReservation(reservationId);
     }
