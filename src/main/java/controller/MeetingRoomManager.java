@@ -1,9 +1,6 @@
 package controller;
 
-import model.Reservation;
-import model.ReservationDAO;
-import model.Room;
-import model.RoomDAO;
+import model.*;
 
 import java.sql.SQLException;
 import java.util.UUID;
@@ -11,14 +8,28 @@ import java.util.UUID;
 public class MeetingRoomManager {
     private ReservationDAO reservationDAO;
     private RoomDAO roomDAO;
-    // private EmployeeDAO employeeDAO;
+    private EmployeeDAO employeeDAO;
 
 
     public MeetingRoomManager() {
         this.reservationDAO = new ReservationDAO();
         this.roomDAO = new RoomDAO();
-        // this.employeeDAO = new EmployeeDAO();
+        this.employeeDAO = new EmployeeDAO();
 
+    }
+
+    /**
+     * Modificar los datos de un nuevo empleado existente.
+     * @param employee El empleado a modificar.
+     * @return true si se ha modificado correctamente, false si no se pudo modificar (por ejemplo, si el empleado no existe o los datos no son correctos).
+     * @throws SQLException Si ocurre un error al acceder a la base de datos.
+     */
+    public boolean modifyEmployee(Employee employee) throws SQLException {
+        // Validar los datos del empleado
+        if (employee.getDni().isBlank() || employee.getName().isBlank() || employee.getEmail().isBlank() || !employee.getEmail().matches(EmployeeDAO.EMAIL_REGEX)) {
+            return false; // Empleado no válido
+        }
+        return employeeDAO.updateEmployee(employee);
     }
 
     /**
@@ -28,7 +39,7 @@ public class MeetingRoomManager {
      * @throws SQLException Si ocurre un error al acceder a la base de datos.
      */
     public boolean modifyRoom(Room room) throws SQLException {
-        if (room.getCapacity() <= 0 || room.getName().isBlank()) {
+        if (room.getRoomId() <= 0 && room.getCapacity() <= 0 || room.getName().isBlank()) {
             return false; // Sala no válida
         }
         // Actualizar la sala en la base de datos
