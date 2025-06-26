@@ -3,6 +3,7 @@ package controller;
 import model.*;
 
 import java.sql.SQLException;
+import java.util.LinkedHashSet;
 import java.util.UUID;
 
 public class MeetingRoomManager {
@@ -16,6 +17,15 @@ public class MeetingRoomManager {
         this.roomDAO = new RoomDAO();
         this.employeeDAO = new EmployeeDAO();
 
+    }
+
+    /**
+     * Obtiene todas las salas de reuniones.
+     * @return Un conjunto de salas.
+     * @throws SQLException Si ocurre un error al acceder a la base de datos.
+     */
+    public LinkedHashSet<Room> getAllRooms() throws SQLException {
+        return roomDAO.getAllRooms();
     }
 
     /**
@@ -39,7 +49,7 @@ public class MeetingRoomManager {
      * @throws SQLException Si ocurre un error al acceder a la base de datos.
      */
     public boolean modifyRoom(Room room) throws SQLException {
-        if (room.getRoomId() <= 0 && room.getCapacity() <= 0 || room.getName().isBlank()) {
+        if (room.getRoomId() <= 0 || room.getCapacity() <= 0 || room.getName().isBlank()) {
             return false; // Sala no válida
         }
         // Actualizar la sala en la base de datos

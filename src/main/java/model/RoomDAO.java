@@ -2,10 +2,8 @@ package model;
 
 import utils.DAOConstants;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
+import java.sql.*;
+import java.util.LinkedHashSet;
 
 public class RoomDAO {
 
@@ -27,4 +25,27 @@ public class RoomDAO {
 
         return isUpdated;
     }
+
+
+    public LinkedHashSet<Room> getAllRooms() throws SQLException {
+        LinkedHashSet<Room> rooms = new LinkedHashSet<>();
+        String sqlGetAllRooms = "SELECT * FROM rooms";
+
+        try (Connection connection = DriverManager.getConnection(DAOConstants.JDBC_URL, DAOConstants.JDBC_USER, DAOConstants.JDBC_PASSWORD);
+             PreparedStatement preparedStatement = connection.prepareStatement(sqlGetAllRooms)) {
+
+            ResultSet rs = preparedStatement.executeQuery();
+            while (rs.next()) {
+                int roomId = rs.getInt("room_id");
+                String name = rs.getString("name");
+                int capacity = rs.getInt("capacity");
+                String resources = rs.getString("resources");
+
+                Room room = new Room(roomId, name, capacity, resources);
+                rooms.add(room);
+            }
+        }
+        return rooms;
+    }
+
 }

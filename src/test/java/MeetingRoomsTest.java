@@ -1,10 +1,13 @@
 import controller.MeetingRoomManager;
 import model.Reservation;
+import model.Room;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
 import java.sql.Date;
 import java.sql.SQLException;
 import java.sql.Time;
+import java.util.LinkedHashSet;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -64,5 +67,29 @@ public class MeetingRoomsTest {
         assertTrue(mrmanager.cancelReservation(reservationId));
     }
 
+    /**
+     * Modificar una habitación de manera no válida
+     */
+    @Test
+    public void testModifyRoom() throws SQLException {
+        // Creamos una sala válida
+        Room modifiedRoom1 = new Room(1, "Sala Aurora", 0, "Proyector, Pizarra blanca, WiFi");
+
+        Room modifiedRoom2 = new Room(1, "", -2, "Proyector, Pizarra blanca, WiFi");
+
+        // Comprobamos no se puede modificar la sala porque la capacidad es 0
+        assertFalse(mrmanager.modifyRoom(modifiedRoom1));
+        // Comprobamos no se puede modificar la sala porque el nombre está vacio y la capacidad es negativa
+        assertFalse(mrmanager.modifyRoom(modifiedRoom2));
+    }
+
+    @Test
+    public void testGetAllRooms() throws SQLException {
+        // Obtenemos todas las salas
+        LinkedHashSet<Room> rooms = mrmanager.getAllRooms();
+        rooms.forEach(System.out::println);
+        // Comprobamos que se obtienen todas las salas
+        assertFalse(rooms.isEmpty());
+    }
 
 }
