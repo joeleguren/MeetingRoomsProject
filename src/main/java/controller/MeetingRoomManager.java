@@ -5,6 +5,7 @@ import model.*;
 import java.sql.SQLException;
 import java.util.LinkedHashSet;
 import java.util.Optional;
+import java.util.TreeSet;
 import java.util.UUID;
 
 public class MeetingRoomManager {
@@ -12,11 +13,19 @@ public class MeetingRoomManager {
     private RoomDAO roomDAO;
     private EmployeeDAO employeeDAO;
 
-
     public MeetingRoomManager() {
         this.reservationDAO = new ReservationDAO();
         this.roomDAO = new RoomDAO();
         this.employeeDAO = new EmployeeDAO();
+    }
+
+    /**
+     * Devuelve un TreeSet con todos los empleados de la base de datos, ordenados por DNI.
+     * @return Un TreeSet de empleados.
+     * @throws SQLException Si ocurre un error al acceder a la base de datos.
+     */
+    public TreeSet<Employee> getAllEmployees() throws SQLException {
+        return employeeDAO.getAllEmployees();
     }
 
     /**
@@ -92,9 +101,9 @@ public class MeetingRoomManager {
      */
     private boolean canBeReserved(Reservation reservation) throws SQLException {
         // Comprobamos si el empleado existe, si la sala existe y si se puede reservar
-        return employeeDAO.getEmployeeByDni(reservation.getDni()).isEmpty()
-                || roomDAO.getRoomById(reservation.getRoomId()).isEmpty()
-                || reservationDAO.canReservate(reservation);
+        return employeeDAO.getEmployeeByDni(reservation.getDni()).isPresent()
+                && roomDAO.getRoomById(reservation.getRoomId()).isPresent()
+                && reservationDAO.canReservate(reservation);
     }
 
     /**

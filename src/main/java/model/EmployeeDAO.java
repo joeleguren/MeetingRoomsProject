@@ -3,11 +3,40 @@ package model;
 import utils.DAOConstants;
 
 import java.sql.*;
+import java.util.Comparator;
 import java.util.Optional;
+import java.util.TreeSet;
 
 public class EmployeeDAO {
     public static final String EMAIL_REGEX = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$";
 
+    /**
+     * Devuelve un TreeSet con todos los empleados de la base de datos, ordenados por DNI.
+     * @return Un TreeSet de empleados.
+     * @throws SQLException Si ocurre un error al acceder a la base de datos.
+     */
+    public TreeSet<Employee> getAllEmployees() throws SQLException {
+        // Creamos un TreeSet para almacenar los empleados, ordenados por departamento y luego por nombre
+        TreeSet<Employee> employes = new TreeSet<>(Comparator.comparing(Employee::getDepartment).thenComparing(Employee::getName));
+        String sqlGetAllEmployees = "SELECT * FROM employees";
+
+        try (Connection conn = DriverManager.getConnection(DAOConstants.JDBC_URL, DAOConstants.JDBC_USER, DAOConstants.JDBC_PASSWORD);
+             PreparedStatement ps = conn.prepareStatement(sqlGetAllEmployees);
+             ResultSet rs = ps.executeQuery()) {
+
+            // Iteramos sobre el ResultSet y añadimos cada empleado al conjunto
+            while (rs.next()) {
+                String dni = rs.getString("dni");
+                String name = rs.getString("name");
+                String email = rs.getString("email");
+                String department = rs.getString("department");
+
+                // Creamos el objeto Employee y lo añadimos al conjunto
+                employes.add(new Employee(dni, name, email.toLowerCase(), department)); // Guardamos el email en minúsculas
+            }
+        }
+        return employes;
+    }
 
     /**
      * Devuelve un Optional<Employee> que contiene un empleado si se encuentra en la base de datos.

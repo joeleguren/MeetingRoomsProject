@@ -67,10 +67,13 @@ public class Room {
 
     @Override
     public String toString() {
-        return "Sala " + roomId +
-                " [ Nombre: " + name + ". Con capacidad para " +
-                capacity + " personas" +
-                ". Recursos: '" + resources + '\'' +
-                " ]";
+        return "\n==============================" +
+                "\n|   SALA                     |" +
+                "\n==============================" +
+                "\n| ID:         " + roomId +
+                "\n| Nombre:     " + name +
+                "\n| Capacidad:  " + capacity +
+                "\n| Recursos:   " + resources +
+                "\n==============================\n";
     }
 }

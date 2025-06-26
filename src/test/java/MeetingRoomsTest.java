@@ -1,4 +1,5 @@
 import controller.MeetingRoomManager;
+import model.Employee;
 import model.Reservation;
 import model.Room;
 import org.junit.jupiter.api.BeforeEach;
@@ -8,8 +9,11 @@ import java.sql.Date;
 import java.sql.SQLException;
 import java.sql.Time;
 import java.util.LinkedHashSet;
+import java.util.Optional;
+import java.util.TreeSet;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class MeetingRoomsTest {
 
@@ -21,7 +25,7 @@ public class MeetingRoomsTest {
    }
 
     /**
-     * Añadir una reserva valida
+     * Añadir una reserva válida
      */
    @Test
     public void testAddValidReservation() throws SQLException {
@@ -31,40 +35,44 @@ public class MeetingRoomsTest {
                Time.valueOf("14:30:00").toLocalTime(),
                Time.valueOf("16:00:00").toLocalTime());
 
-       // Comprobamos que la reserva se añade correctamente, devuelve el codigo de reserva
-       assertNotNull(mrmanager.addReservation(reservation));
+       // Comprobamos que la reserva se añade correctamente, el Optional debe estar presente
+       assertTrue(mrmanager.addReservation(reservation).isPresent());
    }
 
     /**
-     * Añadir una reserva no valida
+     * Añadir una reserva no válida
      */
     @Test
     public void testAddInvalidReservation() throws SQLException {
-        Reservation reservation = new Reservation(19,
+        Reservation reservation = new Reservation(5,
                 "47586920X",
-                Date.valueOf("2024-07-10").toLocalDate(),
-                Time.valueOf("10:00:00").toLocalTime(),
-                Time.valueOf("10:30:00").toLocalTime());
+                Date.valueOf("2025-07-10").toLocalDate(),
+                Time.valueOf("15:50:00").toLocalTime(), // Aqui solapa con otra reserva
+                Time.valueOf("17:00:00").toLocalTime());
 
-        // Comprobamos que la reserva falla, devuelve null en vez del codigo de reserva
-        assertNull(mrmanager.addReservation(reservation));
+        // Comprobamos que la reserva falla, el Optional debe estar vacío
+        assertTrue(mrmanager.addReservation(reservation).isEmpty());
     }
 
     /**
-     * Cancelar una reserva valida
+     * Cancelar una reserva válida
      */
     @Test
     public void testCancelValidReservation() throws SQLException {
-        Reservation reservation = new Reservation(5,
-                "45678901D",
-                Date.valueOf("2025-07-10").toLocalDate(),
-                Time.valueOf("14:30:00").toLocalTime(),
-                Time.valueOf("16:00:00").toLocalTime());
+        Reservation reservation = new Reservation(7,
+                "22334455L",
+                Date.valueOf("2025-08-05").toLocalDate(),
+                Time.valueOf("13:15:00").toLocalTime(),
+                Time.valueOf("15:45:00").toLocalTime());
 
-        String reservationId = mrmanager.addReservation(reservation);
+        Optional<String> reservationId = mrmanager.addReservation(reservation);
+
+        if (reservationId.isEmpty()) {
+            throw new SQLException("No se pudo añadir la reserva para cancelar");
+        }
 
         // Cancelamos la reserva y comprobamos que devuelve true, lo que indica que se ha cancelado correctamente
-        assertTrue(mrmanager.cancelReservation(reservationId));
+        assertTrue(mrmanager.cancelReservation(reservationId.get()));
     }
 
     /**
@@ -90,6 +98,15 @@ public class MeetingRoomsTest {
         rooms.forEach(System.out::println);
         // Comprobamos que se obtienen todas las salas
         assertFalse(rooms.isEmpty());
+    }
+
+    @Test
+    public void testGetAllEmployees() throws SQLException {
+        // Obtenemos todas las salas
+        TreeSet<Employee> employees = mrmanager.getAllEmployees();
+        employees.forEach(System.out::println);
+        // Comprobamos que se obtienen todas las salas
+        assertFalse(employees.isEmpty());
     }
 
 }
