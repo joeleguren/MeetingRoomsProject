@@ -4,6 +4,7 @@ import model.*;
 
 import java.sql.SQLException;
 import java.util.LinkedHashSet;
+import java.util.Optional;
 import java.util.UUID;
 
 public class MeetingRoomManager {
@@ -16,7 +17,6 @@ public class MeetingRoomManager {
         this.reservationDAO = new ReservationDAO();
         this.roomDAO = new RoomDAO();
         this.employeeDAO = new EmployeeDAO();
-
     }
 
     /**
@@ -36,7 +36,10 @@ public class MeetingRoomManager {
      */
     public boolean modifyEmployee(Employee employee) throws SQLException {
         // Validar los datos del empleado
-        if (employee.getDni().isBlank() || employee.getName().isBlank() || employee.getEmail().isBlank() || !employee.getEmail().matches(EmployeeDAO.EMAIL_REGEX)) {
+        if (employee.getDni().isBlank()
+                || employee.getName().isBlank()
+                || employee.getEmail().isBlank()
+                || !employee.getEmail().matches(EmployeeDAO.EMAIL_REGEX)) {
             return false; // Empleado no válido
         }
         return employeeDAO.updateEmployee(employee);
@@ -66,23 +69,38 @@ public class MeetingRoomManager {
         return reservationDAO.cancelReservation(reservationId);
     }
 
-    public String addReservation(Reservation reservation) throws SQLException {
-
+    /**
+     * Añade una nueva reserva.
+     * @param reservation La reserva a añadir.
+     * @return Un Optional que contiene el ID de la reserva si se ha añadido correctamente, o un Optional vacío si no se puede reservar.
+     * @throws SQLException Si ocurre un error al acceder a la base de datos.
+     */
+    public Optional<String> addReservation(Reservation reservation) throws SQLException {
         reservation.setReservationId(generateReservationID());
 
-        // Comprobamos si el empleado existe
-        // if (EmployeeDAO.getEmployeeByDNI(reservation.getDni()) == null) {
-        //      return null;
-        // }
-
-        // Comprobamos si la sala existe y si se puede reservar
-        // if (roomDAO.getRoomById(roomId) == null || reservationDAO.canReservate(roomId, reservationDate, startTime, endTime)) {
-        //     return null;
-        // }
+        if (!canBeReserved(reservation)) {
+            return Optional.empty(); // La reserva no se puede realizar
+        }
         return reservationDAO.addReservation(reservation);
     }
 
+    /**
+     * Devuelve true si la reserva puede ser realizada, es decir, si el empleado existe, la sala existe y se puede reservar.
+     * @param reservation La reserva a comprobar.
+     * @return true si la reserva puede ser realizada, false en caso contrario.
+     * @throws SQLException Si ocurre un error al acceder a la base de datos.
+     */
+    private boolean canBeReserved(Reservation reservation) throws SQLException {
+        // Comprobamos si el empleado existe, si la sala existe y si se puede reservar
+        return employeeDAO.getEmployeeByDni(reservation.getDni()).isEmpty()
+                || roomDAO.getRoomById(reservation.getRoomId()).isEmpty()
+                || reservationDAO.canReservate(reservation);
+    }
 
+    /**
+     * Genera un ID único para una reserva.
+     * @return Un String que representa el ID de la reserva.
+     */
     private String generateReservationID() {
         return UUID.randomUUID().toString().replace("-", "").substring(0, 10);
     }

@@ -4,17 +4,18 @@ import utils.DAOConstants;
 
 import java.sql.*;
 import java.time.LocalDate;
+import java.util.Optional;
 
 public class ReservationDAO {
 
     /**
      * Añade una reserva a la base de datos.
      * @param reservation La reserva a añadir.
-     * @return El ID de la reserva añadida, o null si no se pudo añadir.
+     * @return Un Optional que contiene el ID de la reserva si se ha añadido correctamente, o un Optional vacío si no se ha podido añadir.
      * @throws SQLException Si ocurre un error al acceder a la base de datos.
      */
-    public String addReservation(Reservation reservation) throws SQLException {
-        String reservationId = null;
+    public Optional<String> addReservation(Reservation reservation) throws SQLException {
+        Optional<String> reservationId = Optional.empty();
         String sqlAddReservation = "INSERT INTO reservations (reservation_id, room_id, dni, reservation_date, start_time, end_time) VALUES (?, ?, ?, ?, ?, ?)";
 
         try (Connection conn = DriverManager.getConnection(DAOConstants.JDBC_URL, DAOConstants.JDBC_USER, DAOConstants.JDBC_PASSWORD);
@@ -28,11 +29,12 @@ public class ReservationDAO {
             ps.setTime(6, Time.valueOf(reservation.getEndTime()));
 
             if (ps.executeUpdate() > 0) {
-                reservationId = reservation.getReservationId();
+                reservationId = Optional.of(reservation.getReservationId());
             }
         }
         return reservationId;
     }
+
 
     /**
      * Cancela una reserva de la base de datos.
@@ -83,13 +85,14 @@ public class ReservationDAO {
         return false;
     }
 
+
     /**
      * Comprueba si se puede reservar una sala.
      * @param reservation La reserva a comprobar.
      * @return true si se puede reservar, false si no se puede (por ejemplo, si ya hay una reserva en ese horario).
      * @throws SQLException Si ocurre un error al acceder a la base de datos.
      */
-    private boolean canReservate(Reservation reservation) throws SQLException {
+    public boolean canReservate(Reservation reservation) throws SQLException {
         boolean canReserve = true; // Por defecto se puede reservar
 
         // Comprobar que la fecha de reserva es futura y no es hoy
