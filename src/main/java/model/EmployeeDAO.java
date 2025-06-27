@@ -11,6 +11,26 @@ public class EmployeeDAO {
     public static final String EMAIL_REGEX = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$";
 
     /**
+     * Elimina un empleado de la base de datos.
+     * @param dni DNI del empleado que se quiere eliminar.
+     * @return true si el empleado se ha eliminado correctamente, false si el empleado no existe (no se encuentra el DNI).
+     * @throws SQLException Si ocurre un error al acceder a la base de datos.
+     */
+    public boolean deleteEmployee(String dni) throws SQLException {
+        boolean isDeleted = false;
+        String sqlDeleteEmployee = "DELETE FROM employees WHERE dni = ?";
+
+        try (Connection connection = DriverManager.getConnection(DAOConstants.JDBC_URL, DAOConstants.JDBC_USER, DAOConstants.JDBC_PASSWORD);
+             PreparedStatement preparedStatement = connection.prepareStatement(sqlDeleteEmployee)) {
+
+            preparedStatement.setString(1, dni);
+            int rowsAffected = preparedStatement.executeUpdate();
+            isDeleted = rowsAffected > 0; // Si se ha afectado alguna fila, el empleado se ha eliminado correctamente
+        }
+        return isDeleted;
+    }
+
+    /**
      * Añade un nuevo empleado a la base de datos.
      * @param employee El objeto Employee que se quiere añadir.
      * @return true si el empleado se ha añadido correctamente, false si ya existe un empleado con el mismo DNI.

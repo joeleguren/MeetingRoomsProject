@@ -19,6 +19,27 @@ public class MeetingRoomManager {
         this.employeeDAO = new EmployeeDAO();
     }
 
+    /**
+     * Elimina un empleado de la base de datos.
+     * @param dni DNI del empleado que se quiere eliminar.
+     * @return true si se ha eliminado correctamente, false si no se pudo eliminar (por ejemplo, si el empleado tiene reservas activas).
+     * @throws SQLException Si ocurre un error al acceder a la base de datos.
+     */
+    public boolean deleteEmployee(String dni) throws SQLException {
+        // Comprobamos si el empleado tiene alguna reserva asociada
+        if (reservationDAO.employeeHasReservations(dni)) {
+            return false;
+        }
+        // Eliminar el empleado de la base de datos
+        return employeeDAO.deleteEmployee(dni);
+    }
+
+    /**
+     * Añade un nuevo empleado a la base de datos.
+     * @param employee El empleado que se quiere añadir.
+     * @return true si se ha añadido correctamente, false si no se pudo añadir (por ejemplo, si los datos no son correctos).
+     * @throws SQLException Si ocurre un error al acceder a la base de datos.
+     */
     public boolean addEmployee(Employee employee) throws SQLException {
         // Validar los datos del empleado
         if (!isValidEmployee(employee)) {
@@ -35,11 +56,10 @@ public class MeetingRoomManager {
      * @throws SQLException Si ocurre un error al acceder a la base de datos.
      */
     public boolean deleteRoom(int roomId) throws SQLException {
-        // Eliminar la sala de reuniones de la base de datos
-
         if (reservationDAO.roomHasReservations(roomId)) {
             return false; // No se puede eliminar la sala si tiene reservas
         }
+        // Eliminar la sala de reuniones de la base de datos
         return roomDAO.deleteRoom(roomId);
     }
 
