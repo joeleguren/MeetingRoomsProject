@@ -2,6 +2,8 @@ package view;
 
 import controller.MeetingRoomManager;
 import model.Employee;
+import model.Reservation;
+import model.ReservationDAO;
 import model.Room;
 import utils.ConsoleColors;
 
@@ -67,18 +69,76 @@ public class MeetingRoomMain {
                 } while (subOption != MeetingRoomMain.EXIT_OPTION); // Bucle para gestionar las opciones de salas
                 break;
             case 3:
-                // Aquí puedes implementar la lógica para añadir una sala
-                System.out.println("Añadiendo una nueva sala...");
-                // mrmanager.addRoom(...);
+                manageAddReservation(mrmanager); // Llamamos al método para gestionar las reservas
                 break;
             case 4:
-                // Aquí puedes implementar la lógica para eliminar una sala
-                System.out.println("Eliminando una sala...");
-                // mrmanager.deleteRoom(...);
+                manageCancelReservation(mrmanager); // Llamamos al método para gestionar las reservas
                 break;
             default:
                 System.out.println(ConsoleColors.RED_BOLD + "Opción no válida. Por favor, intenta de nuevo." + ConsoleColors.RESET + "\n");
         }
+    }
+
+    private static void manageCancelReservation(MeetingRoomManager mrmanager) {
+        Scanner keyboard = new Scanner(System.in); // Scanner para leer los input del usuario
+
+        System.out.println("--- Cancelar una reserva ---");
+        System.out.print("Introduce el código de la reserva que deseas cancelar: ");
+        String reservationId = keyboard.nextLine();
+        try {
+            if (mrmanager.cancelReservation(reservationId)) { // Llamamos al método para eliminar la reserva
+                System.out.println(ConsoleColors.GREEN_BOLD + "Reserva cancelada correctamente." + ConsoleColors.RESET);
+            } else {
+                System.out.println(ConsoleColors.RED_BOLD + "Error al cancelar la reserva, puede que no exista o que ya haya pasado el tiempo para cancelar." + ConsoleColors.RESET);
+            }
+        } catch (SQLException e) {
+            System.out.println(ConsoleColors.RED_BOLD + "Error al cancelar la reserva: " + e.getMessage() + ConsoleColors.RESET);
+        }
+    }
+
+    private static void manageAddReservation(MeetingRoomManager mrmanager) {
+        Scanner keyboard = new Scanner(System.in); // Scanner para leer los input del usuario
+
+        System.out.println("--- Reservar una sala de reuniones ---");
+        System.out.print("Introduce el DNI del empleado que reserva la sala: ");
+        String dni = keyboard.nextLine();
+        System.out.print("Introduce el ID de la sala que desea reservar: ");
+        int roomId = Integer.parseInt(keyboard.nextLine());
+        System.out.print("Introduce la fecha de la reserva (YYYY-MM-DD): ");
+        String reservationDate = keyboard.nextLine();
+        System.out.print("Introduce la hora de inicio de la reserva (HH:MM): ");
+        String startTime = keyboard.nextLine();
+        System.out.print("Introduce la hora de fin de la reserva (HH:MM): ");
+        String endTime = keyboard.nextLine();
+        try {
+            if (validReservationDate(reservationDate, startTime, endTime)) { // Validamos la fecha y hora de la reserva
+                Reservation newReservation = new Reservation(
+                        roomId,
+                        dni,
+                        java.time.LocalDate.parse(reservationDate),
+                        java.time.LocalTime.parse(startTime),
+                        java.time.LocalTime.parse(endTime)
+                );
+                // Creamos una nueva reserva
+                Optional<String> reservationId = mrmanager.addReservation(newReservation); // Generamos un ID único para la reserva
+                if (reservationId.isPresent()) { // Si nos ha devuelto un ID de reserva, es que se ha podido añadir correctamente.
+                    System.out.println(ConsoleColors.GREEN_BOLD + "Reserva añadida correctamente. Su código es " + reservationId.get() + ConsoleColors.RESET + ".");
+                } else { // No se ha podido añadir la reserva
+                    System.out.println(ConsoleColors.RED_BOLD + "Error al añadir la reserva, puede que la sala no exista, el empleado no exista o los datos introducidos sean inválidos." + ConsoleColors.RESET);
+                }
+            } else {
+                System.out.println(ConsoleColors.RED_BOLD + "Fecha o hora de reserva inválida. Por favor, inténtalo de nuevo." + ConsoleColors.RESET);
+                return; // Salimos del método si la fecha o hora no son válidas
+            }
+        } catch (SQLException e) {
+            System.out.println(ConsoleColors.RED_BOLD + "Error al añadir la reserva: " + e.getMessage() + ConsoleColors.RESET);
+        }
+    }
+
+    private static boolean validReservationDate(String reservationDate, String startTime, String endTime) {
+        return reservationDate.matches(ReservationDAO.DATE_REGEX) && // Comprobamos que la fecha sigue el formato YYYY-MM-DD
+               startTime.matches(ReservationDAO.TIME_REGEX) && // Comprobamos que la hora de inicio sigue el formato HH:MM:SS
+               endTime.matches(ReservationDAO.TIME_REGEX); // Comprobamos que la hora de fin sigue el formato HH:MM:SS
     }
 
     private static void manageEmployeeManagementOptions(int subOption, MeetingRoomManager mrmanager) {
