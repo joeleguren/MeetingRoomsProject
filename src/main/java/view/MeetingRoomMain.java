@@ -99,18 +99,18 @@ public class MeetingRoomMain {
     private static void manageAddReservation(MeetingRoomManager mrmanager) {
         Scanner keyboard = new Scanner(System.in); // Scanner para leer los input del usuario
 
-        System.out.println("--- Reservar una sala de reuniones ---");
-        System.out.print("Introduce el DNI del empleado que reserva la sala: ");
-        String dni = keyboard.nextLine();
-        System.out.print("Introduce el ID de la sala que desea reservar: ");
-        int roomId = Integer.parseInt(keyboard.nextLine());
-        System.out.print("Introduce la fecha de la reserva (YYYY-MM-DD): ");
-        String reservationDate = keyboard.nextLine();
-        System.out.print("Introduce la hora de inicio de la reserva (HH:MM): ");
-        String startTime = keyboard.nextLine();
-        System.out.print("Introduce la hora de fin de la reserva (HH:MM): ");
-        String endTime = keyboard.nextLine();
         try {
+            System.out.println("--- Reservar una sala de reuniones ---");
+            System.out.print("Introduce el DNI del empleado que reserva la sala: ");
+            String dni = keyboard.nextLine();
+            System.out.print("Introduce el ID de la sala que desea reservar: ");
+            int roomId = Integer.parseInt(keyboard.nextLine());
+            System.out.print("Introduce la fecha de la reserva (YYYY-MM-DD): ");
+            String reservationDate = keyboard.nextLine();
+            System.out.print("Introduce la hora de inicio de la reserva (HH:MM): ");
+            String startTime = keyboard.nextLine();
+            System.out.print("Introduce la hora de fin de la reserva (HH:MM): ");
+            String endTime = keyboard.nextLine();
             if (validReservationDate(reservationDate, startTime, endTime)) { // Validamos la fecha y hora de la reserva
                 Reservation newReservation = new Reservation(
                         roomId,
@@ -132,6 +132,8 @@ public class MeetingRoomMain {
             }
         } catch (SQLException e) {
             System.out.println(ConsoleColors.RED_BOLD + "Error al añadir la reserva: " + e.getMessage() + ConsoleColors.RESET);
+        } catch (NumberFormatException e) {
+            System.out.println(ConsoleColors.RED_BOLD + "ID de sala inválido. Debe ser un número entero." + ConsoleColors.RESET);
         }
     }
 
