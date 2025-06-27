@@ -20,6 +20,21 @@ public class MeetingRoomManager {
     }
 
     /**
+     * Elimina una sala de reuniones de la base de datos.
+     * @param roomId El ID de la sala a eliminar.
+     * @return true si se ha eliminado correctamente, false si no se pudo eliminar (por ejemplo, si la sala tiene reservas).
+     * @throws SQLException Si ocurre un error al acceder a la base de datos.
+     */
+    public boolean deleteRoom(int roomId) throws SQLException {
+        // Eliminar la sala de reuniones de la base de datos
+
+        if (reservationDAO.roomHasReservations(roomId)) {
+            return false; // No se puede eliminar la sala si tiene reservas
+        }
+        return roomDAO.deleteRoom(roomId);
+    }
+
+    /**
      * Añade una nueva sala de reuniones a la base de datos.
      * @param room La sala de reuniones que se quiere añadir.
      * @return true si se ha añadido correctamente, false si no se pudo añadir (por ejemplo, si los datos no son correctos o la sala ya existe).

@@ -9,6 +9,26 @@ import java.util.Optional;
 public class RoomDAO {
 
     /**
+     * Elimina una sala de reuniones de la base de datos.
+     * @param roomId El ID de la sala a eliminar.
+     * @return true si se ha eliminado correctamente, false si no se pudo eliminar (por ejemplo, si la sala no existe).
+     * @throws SQLException Si ocurre un error al acceder a la base de datos.
+     */
+    public boolean deleteRoom(int roomId) throws SQLException {
+        boolean isDeleted = false;
+        String sqlDeleteRoom = "DELETE FROM rooms WHERE room_id = ?";
+
+        try (Connection connection = DriverManager.getConnection(DAOConstants.JDBC_URL, DAOConstants.JDBC_USER, DAOConstants.JDBC_PASSWORD);
+             PreparedStatement preparedStatement = connection.prepareStatement(sqlDeleteRoom)) {
+
+            preparedStatement.setInt(1, roomId);
+            int rowsAffected = preparedStatement.executeUpdate();
+            isDeleted = rowsAffected > 0; // Si se ha afectado alguna fila, la sala se ha eliminado correctamente
+        }
+        return isDeleted;
+    }
+
+    /**
      * Añade una sala de reuniones a la base de datos.
      * @param room La sala de reuniones que se quiere añadir.
      * @return true si se ha añadido correctamente, false si no se pudo añadir (por ejemplo, si la sala ya existe).
