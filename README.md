@@ -60,6 +60,7 @@ git clone https://github.com/joeleguren/MeetingRoomsProject.git
 2. Abre el proyecto en tu IDE favorito.
    - Si usas **IntelliJ IDEA**, puedes abrir el proyecto directamente desde la carpeta clonada.
    - Si usas **Eclipse**, asegúrate de tener instalado el plugin de Maven y luego importa el proyecto como un proyecto Maven existente.
+   - Si usas **VS Code**, asegúrate de tener las extensiones de Java y Maven instaladas, y abre la carpeta del proyecto.
 3. Configura la conexión a la base de datos MySQL:
    - Localiza el fichero `/sql/meeting_rooms_db.sql` que es el script de creación de la base de datos y los inserts.
    - Desde la terminal de SQL, pega y ejecuta el script de creación de la base de datos.
