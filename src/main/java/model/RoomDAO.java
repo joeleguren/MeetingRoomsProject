@@ -9,6 +9,34 @@ import java.util.Optional;
 public class RoomDAO {
 
     /**
+     * Añade una sala de reuniones a la base de datos.
+     * @param room La sala de reuniones que se quiere añadir.
+     * @return true si se ha añadido correctamente, false si no se pudo añadir (por ejemplo, si la sala ya existe).
+     * @throws SQLException Si ocurre un error al acceder a la base de datos.
+     */
+    public boolean addRoom(Room room) throws SQLException {
+        boolean isAdded = false;
+        String sqlAddRoom = "INSERT INTO rooms (room_id, name, capacity, resources) VALUES (?, ?, ?, ?)";
+
+        if (getRoomById(room.getRoomId()).isPresent()) { // Comprueba si la sala ya existe obteniendo la sala por su ID
+            return false; // Si la sala ya existe, no se añade
+        }
+
+        try(Connection connection = DriverManager.getConnection(DAOConstants.JDBC_URL, DAOConstants.JDBC_USER, DAOConstants.JDBC_PASSWORD);
+            PreparedStatement preparedStatement = connection.prepareStatement(sqlAddRoom)) {
+
+            preparedStatement.setInt(1, room.getRoomId());
+            preparedStatement.setString(2, room.getName());
+            preparedStatement.setInt(3, room.getCapacity());
+            preparedStatement.setString(4, room.getResources());
+
+            int rowsAffected = preparedStatement.executeUpdate();
+            isAdded = rowsAffected > 0; // Si se ha afectado alguna fila, la sala se ha añadido correctamente
+        }
+        return  isAdded;
+    }
+
+    /**
      * Devuelve un Optional<Room> con la sala de reuniones que tiene el id indicado.
      * @param roomId El id de la sala que se quiere buscar.
      * @return Optional<Room> con la sala de reuniones si existe, o un Optional vacío si no existe.

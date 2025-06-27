@@ -20,7 +20,22 @@ public class MeetingRoomManager {
     }
 
     /**
-     * Devuelve un TreeSet con todos los empleados de la base de datos, ordenados por DNI.
+     * Añade una nueva sala de reuniones a la base de datos.
+     * @param room La sala de reuniones que se quiere añadir.
+     * @return true si se ha añadido correctamente, false si no se pudo añadir (por ejemplo, si los datos no son correctos o la sala ya existe).
+     * @throws SQLException Si ocurre un error al acceder a la base de datos.
+     */
+    public boolean addRoom(Room room) throws SQLException {
+        // Validar los datos de la sala
+        if (!isValidRoom(room)) {
+            return false; // Sala no válida
+        }
+        // Añadir la sala a la base de datos una vez validada
+        return roomDAO.addRoom(room);
+    }
+
+    /**
+     * Devuelve un TreeSet con todos los empleados de la base de datos, ordenados por departamento y luego por nombre.
      * @return Un TreeSet de empleados.
      * @throws SQLException Si ocurre un error al acceder a la base de datos.
      */
@@ -93,7 +108,7 @@ public class MeetingRoomManager {
      * @throws SQLException Si ocurre un error al acceder a la base de datos.
      */
     public Optional<String> addReservation(Reservation reservation) throws SQLException {
-        reservation.setReservationId(generateReservationID());
+        reservation.setReservationId(generateReservationID()); // Generar un ID único para la reserva
 
         if (!canBeReserved(reservation)) {
             return Optional.empty(); // La reserva no se puede realizar
