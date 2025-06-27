@@ -19,6 +19,11 @@ public class MeetingRoomManager {
         this.employeeDAO = new EmployeeDAO();
     }
 
+    public Optional<Room> getRoomById(int roomId) throws SQLException {
+        // Obtener una sala de reuniones por su ID
+        return roomDAO.getRoomById(roomId);
+    }
+
     /**
      * Elimina un empleado de la base de datos.
      * @param dni DNI del empleado que se quiere eliminar.
