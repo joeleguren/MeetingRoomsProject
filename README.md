@@ -61,9 +61,9 @@ git clone https://github.com/joeleguren/MeetingRoomsProject.git
    - Si usas **IntelliJ IDEA**, puedes abrir el proyecto directamente desde la carpeta clonada.
    - Si usas **Eclipse**, asegúrate de tener instalado el plugin de Maven y luego importa el proyecto como un proyecto Maven existente.
 3. Configura la conexión a la base de datos MySQL:
-  - Localiza el fichero `/sql/meeting_rooms_db.sql` que es el script de creación de la base de datos y los inserts.
-  - Desde la terminal de SQL, pega y ejecuta el script de creación de la base de datos.
-  - Asegúrate que el usuario y la contraseña de la base de datos en el archivo `src/main/java/utils/DAOConstants` coincidan con los de tu instalación de MySQL.
+   - Localiza el fichero `/sql/meeting_rooms_db.sql` que es el script de creación de la base de datos y los inserts.
+   - Desde la terminal de SQL, pega y ejecuta el script de creación de la base de datos.
+   - Asegúrate que el usuario y la contraseña de la base de datos en el archivo `src/main/java/utils/DAOConstants` coincidan con los de tu instalación de MySQL.
 4. Compila el proyecto con Maven desde tu IDE favorito y ejecuta la clase `MeetingRoomMain.java`.
 
 ## 📌 Enlace al tablero Scrum
