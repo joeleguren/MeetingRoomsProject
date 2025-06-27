@@ -9,6 +9,52 @@ import java.util.Optional;
 public class ReservationDAO {
 
     /**
+     * Comprueba si un empleado tiene o ha tenido reservas.
+     * @param dni El DNI del empleado a comprobar.
+     * @return true si el empleado tiene reservas, false si no tiene reservas.
+     * @throws SQLException Si ocurre un error al acceder a la base de datos.
+     */
+    public boolean employeeHasReservations(String dni) throws SQLException {
+        boolean hasReservations = false;
+        // Consulta SQL que cuenta las reservas de un empleado por su DNI
+        String sqlCheckEmployeeReservations = "SELECT COUNT(*) FROM reservations WHERE dni = ?";
+
+        try (Connection conn = DriverManager.getConnection(DAOConstants.JDBC_URL, DAOConstants.JDBC_USER, DAOConstants.JDBC_PASSWORD);
+             PreparedStatement ps = conn.prepareStatement(sqlCheckEmployeeReservations)) {
+
+            ps.setString(1, dni);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                hasReservations = rs.getInt(1) > 0; // Si el conteo es mayor que 0, hay reservas
+            }
+        }
+        return hasReservations;
+    }
+
+    /**
+     * Comprueba si una sala tiene o ha tenido reservas.
+     * @param roomId El ID de la sala a comprobar.
+     * @return true si la sala tiene reservas, false si no tiene reservas.
+     * @throws SQLException Si ocurre un error al acceder a la base de datos.
+     */
+    public boolean roomHasReservations(int roomId) throws SQLException {
+        boolean hasReservations = false;
+        // Consulta SQL que cuenta las reservas de una sala por su ID
+        String sqlCheckRoomReservations = "SELECT COUNT(*) FROM reservations WHERE room_id = ?";
+
+        try (Connection conn = DriverManager.getConnection(DAOConstants.JDBC_URL, DAOConstants.JDBC_USER, DAOConstants.JDBC_PASSWORD);
+             PreparedStatement ps = conn.prepareStatement(sqlCheckRoomReservations)) {
+
+            ps.setInt(1, roomId);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                hasReservations = rs.getInt(1) > 0; // Si el conteo es mayor que 0, hay reservas
+            }
+        }
+        return hasReservations;
+    }
+
+    /**
      * Añade una reserva a la base de datos.
      * @param reservation La reserva a añadir.
      * @return Un Optional que contiene el ID de la reserva si se ha añadido correctamente, o un Optional vacío si no se ha podido añadir.
