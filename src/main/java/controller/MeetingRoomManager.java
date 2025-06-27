@@ -58,11 +58,22 @@ public class MeetingRoomManager {
      * @throws SQLException Si ocurre un error al acceder a la base de datos.
      */
     public boolean modifyRoom(Room room) throws SQLException {
-        if (room.getRoomId() <= 0 || room.getCapacity() <= 0 || room.getName().isBlank()) {
+        if (!isValidRoom(room)) {
             return false; // Sala no válida
         }
-        // Actualizar la sala en la base de datos
+        // Actualizar la sala en la base de datos una vez validada
         return roomDAO.updateRoom(room);
+    }
+
+    /**
+     * Comprueba si una sala es válida.
+     * @param room sala a comprobar.
+     * @return true si la sala es válida, false en caso contrario.
+     */
+    private static boolean isValidRoom(Room room) {
+        return room != null && room.getRoomId() > 0
+                && room.getCapacity() > 0
+                && !room.getName().isBlank();
     }
 
     /**
