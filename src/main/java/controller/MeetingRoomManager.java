@@ -45,10 +45,7 @@ public class MeetingRoomManager {
      */
     public boolean modifyEmployee(Employee employee) throws SQLException {
         // Validar los datos del empleado
-        if (employee.getDni().isBlank()
-                || employee.getName().isBlank()
-                || employee.getEmail().isBlank()
-                || !employee.getEmail().matches(EmployeeDAO.EMAIL_REGEX)) {
+        if (isValidEmployee(employee)) {
             return false; // Empleado no válido
         }
         return employeeDAO.updateEmployee(employee);
@@ -91,6 +88,18 @@ public class MeetingRoomManager {
             return Optional.empty(); // La reserva no se puede realizar
         }
         return reservationDAO.addReservation(reservation);
+    }
+
+
+    /**
+     * Mira si un empleado es válido para ser añadido a la base de datos.
+     * @param employee El empleado a comprobar.
+     * @return
+     */
+    private boolean isValidEmployee(Employee employee) {
+        // Comprobamos que el empleado no sea nulo y que sus campos no estén vacíos, además de que el email sea válido cumpliendo el Regex.
+        return employee != null && !employee.getDni().isBlank() && !employee.getName().isBlank()
+                && !employee.getEmail().isBlank() && employee.getEmail().matches(EmployeeDAO.EMAIL_REGEX);
     }
 
     /**
