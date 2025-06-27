@@ -8,6 +8,9 @@ import java.util.Optional;
 
 public class ReservationDAO {
 
+    private static final String DATE_REGEX = "^\\d{4}-\\d{2}-\\d{2}$"; // Formato de fecha esperado: YYYY-MM-DD
+    private static final String TIME_REGEX = "^\\d{2}:\\d{2}:\\d{2}$"; // Formato de hora esperado: HH:MM:SS
+
     /**
      * Comprueba si un empleado tiene o ha tenido reservas.
      * @param dni El DNI del empleado a comprobar.

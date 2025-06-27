@@ -47,7 +47,7 @@ public class MeetingRoomsTest {
         Reservation reservation = new Reservation(5,
                 "47586920X",
                 Date.valueOf("2025-07-10").toLocalDate(),
-                Time.valueOf("15:50:00").toLocalTime(), // Aqui solapa con otra reserva
+                Time.valueOf("15:50:00").toLocalTime(), // Aqui solapa con la anterior reserva
                 Time.valueOf("17:00:00").toLocalTime());
 
         // Comprobamos que la reserva falla, el Optional debe estar vacío
@@ -107,6 +107,34 @@ public class MeetingRoomsTest {
         employees.forEach(System.out::println);
         // Comprobamos que se obtienen todas las salas
         assertFalse(employees.isEmpty());
+    }
+
+    @Test
+    public void testDeleteEmployee() throws SQLException {
+        // Creamos un empleado para eliminar
+        String dni = "99887766Z"; // DNI válido con letra
+        Employee newEmployee = new Employee(
+                dni,
+                "Marc Vilalta Soler",   // Nombre completo
+                "mvilalta@empresa.com", // Email
+                "IT"                   // Departamento
+        );
+        mrmanager.addEmployee(newEmployee); // Añadimos el empleado a la base de datos
+        assertTrue(mrmanager.deleteEmployee(dni)); // Comprobamos que se elimina correctamente, no tiene reservas asociadas
+    }
+
+    @Test
+    public void testDeleteValidRoom() throws SQLException {
+        Room room = new Room(150, "Sala de Reuniones", 10, "Proyector, Pizarra blanca, WiFi");
+        mrmanager.addRoom(room); // Añadimos una sala válida
+        // Intentamos eliminar una sala sin reservas
+        assertTrue(mrmanager.deleteRoom(150)); // Debería fallar porque tiene reservas
+    }
+
+    @Test
+    public void testDeleteRoomWithReservations() throws SQLException {
+        // Intentamos eliminar una sala con reservas
+        assertFalse(mrmanager.deleteRoom(23)); // Debería fallar porque tiene reservas
     }
 
 }
