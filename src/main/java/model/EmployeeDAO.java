@@ -11,6 +11,33 @@ public class EmployeeDAO {
     public static final String EMAIL_REGEX = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$";
 
     /**
+     * Añade un nuevo empleado a la base de datos.
+     * @param employee El objeto Employee que se quiere añadir.
+     * @return true si el empleado se ha añadido correctamente, false si ya existe un empleado con el mismo DNI.
+     * @throws SQLException Si ocurre un error al acceder a la base de datos.
+     */
+    public boolean addEmployee(Employee employee) throws SQLException {
+        boolean isAdded = false;
+        String sqlAddEmployee = "INSERT INTO employees (dni, name, email, department) VALUES (?, ?, ?, ?)";
+
+        if(getEmployeeByDni(employee.getDni()).isPresent()) { // Comprueba si el empleado ya existe obteniendo el empleado por su DNI
+            return false; // Si el empleado ya existe, no se añade
+        }
+        try (Connection connection = DriverManager.getConnection(DAOConstants.JDBC_URL, DAOConstants.JDBC_USER, DAOConstants.JDBC_PASSWORD);
+             PreparedStatement preparedStatement = connection.prepareStatement(sqlAddEmployee)) {
+
+            preparedStatement.setString(1, employee.getDni());
+            preparedStatement.setString(2, employee.getName());
+            preparedStatement.setString(3, employee.getEmail().toLowerCase()); // Guardamos el email en minúsculas
+            preparedStatement.setString(4, employee.getDepartment());
+
+            int rowsAffected = preparedStatement.executeUpdate();
+            isAdded = rowsAffected > 0; // Si se ha afectado alguna fila, el empleado se ha añadido correctamente
+        }
+        return isAdded;
+    }
+
+    /**
      * Devuelve un TreeSet con todos los empleados de la base de datos, ordenados por DNI.
      * @return Un TreeSet de empleados.
      * @throws SQLException Si ocurre un error al acceder a la base de datos.

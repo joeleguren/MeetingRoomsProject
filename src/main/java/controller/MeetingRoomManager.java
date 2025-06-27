@@ -19,6 +19,15 @@ public class MeetingRoomManager {
         this.employeeDAO = new EmployeeDAO();
     }
 
+    public boolean addEmployee(Employee employee) throws SQLException {
+        // Validar los datos del empleado
+        if (!isValidEmployee(employee)) {
+            return false; // Empleado no válido
+        }
+        // Añadir el empleado a la base de datos una vez validado
+        return employeeDAO.addEmployee(employee);
+    }
+
     /**
      * Elimina una sala de reuniones de la base de datos.
      * @param roomId El ID de la sala a eliminar.
@@ -135,7 +144,7 @@ public class MeetingRoomManager {
     /**
      * Mira si un empleado es válido para ser añadido a la base de datos.
      * @param employee El empleado a comprobar.
-     * @return
+     * @return true si el empleado es válido, false en caso contrario.
      */
     private boolean isValidEmployee(Employee employee) {
         // Comprobamos que el empleado no sea nulo y que sus campos no estén vacíos, además de que el email sea válido cumpliendo el Regex.
@@ -150,10 +159,9 @@ public class MeetingRoomManager {
      * @throws SQLException Si ocurre un error al acceder a la base de datos.
      */
     private boolean canBeReserved(Reservation reservation) throws SQLException {
-        // Comprobamos si el empleado existe, si la sala existe y si se puede reservar
-        return employeeDAO.getEmployeeByDni(reservation.getDni()).isPresent()
-                && roomDAO.getRoomById(reservation.getRoomId()).isPresent()
-                && reservationDAO.canReservate(reservation);
+        return employeeDAO.getEmployeeByDni(reservation.getDni()).isPresent() // Comprobamos que el empleado existe
+                && roomDAO.getRoomById(reservation.getRoomId()).isPresent() // Comprobamos que la sala existe
+                && reservationDAO.canReservate(reservation); // Comprobamos que la reserva se puede realizar
     }
 
     /**
