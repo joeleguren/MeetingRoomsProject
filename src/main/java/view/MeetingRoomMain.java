@@ -237,43 +237,41 @@ public class MeetingRoomMain {
                 System.out.println(ConsoleColors.RED_BOLD + "Volviendo al menú principal..." + ConsoleColors.RESET);
                 break; // Volver al menú principal
             case 1:
-                boolean addedRoom = false; // Variable para verificar si se ha añadido la sala correctamente
-
-                System.out.print("Introduce ID de la sala: ");
-                roomId = Integer.parseInt(keyboard.nextLine());
-                System.out.print("Introduce nombre de la sala: ");
-                roomName = keyboard.nextLine();
-                System.out.print("Introduce capacidad de la sala: ");
-                capacity = Integer.parseInt(keyboard.nextLine());
-                System.out.print("Introduce recursos de la sala (separados por comas): ");
-                resources = keyboard.nextLine();
-
                 try {
-                    addedRoom = mrmanager.addRoom(new Room(roomId, roomName, capacity, resources));
+                    System.out.print("Introduce ID de la sala: ");
+                    roomId = Integer.parseInt(keyboard.nextLine());
+                    System.out.print("Introduce nombre de la sala: ");
+                    roomName = keyboard.nextLine();
+                    System.out.print("Introduce capacidad de la sala: ");
+                    capacity = Integer.parseInt(keyboard.nextLine());
+                    System.out.print("Introduce recursos de la sala (separados por comas): ");
+                    resources = keyboard.nextLine();
+                    Room newRoom = new Room(roomId, roomName, capacity, resources);
+
+                    if (mrmanager.addRoom(newRoom)) { // Llamamos al método para añadir la sala, si se ha añadido correctamente, nos devuelve true
+                        System.out.println(ConsoleColors.GREEN_BOLD + "Sala añadida correctamente." + ConsoleColors.RESET);
+                    } else {
+                        System.out.println(ConsoleColors.RED_BOLD + "Error al añadir la sala, ya existe una sala con ese ID o los datos introducidos son inválidos." + ConsoleColors.RESET);
+                    }
                 } catch (SQLException e) {
                     System.out.println(ConsoleColors.RED_BOLD + "Error al añadir la sala: " + e.getMessage() + ConsoleColors.RESET);
-                }
-
-                if (!addedRoom) {
-                    System.out.println(ConsoleColors.RED_BOLD + "Error al añadir la sala, ya existe una sala con ese ID o los datos introducidos son inválidos." + ConsoleColors.RESET);
-                } else {
-                    System.out.println(ConsoleColors.GREEN_BOLD + "Sala añadida correctamente." + ConsoleColors.RESET);
+                } catch (NumberFormatException e) {
+                    System.out.println(ConsoleColors.RED_BOLD + "ID de sala inválido. Debe ser un número entero." + ConsoleColors.RESET);
                 }
                 break;
             case 2:
-                boolean deletedRoom = false; // Variable para verificar si se ha eliminado la sala correctamente
                 try {
                     System.out.print("Introduce el ID de la sala que deseas eliminar: ");
                     roomId = Integer.parseInt(keyboard.nextLine());
-                    deletedRoom = mrmanager.deleteRoom(roomId); // Llamamos al método para eliminar la sala
+                    if (!mrmanager.deleteRoom(roomId)) {
+                        System.out.println(ConsoleColors.RED_BOLD + "Error al eliminar la sala, puede que tenga reservas asociadas o no exista." + ConsoleColors.RESET);
+                    } else {
+                        System.out.println(ConsoleColors.GREEN_BOLD + "Sala eliminada correctamente." + ConsoleColors.RESET);
+                    }
                 } catch (SQLException e) {
                     System.out.println(ConsoleColors.RED_BOLD + "Error al eliminar la sala: " + e.getMessage() + ConsoleColors.RESET);
-                }
-
-                if (!deletedRoom) {
-                    System.out.println(ConsoleColors.RED_BOLD + "Error al eliminar la sala, puede que tenga reservas asociadas o no exista." + ConsoleColors.RESET);
-                } else {
-                    System.out.println(ConsoleColors.GREEN_BOLD + "Sala eliminada correctamente." + ConsoleColors.RESET);
+                } catch (NumberFormatException e) {
+                    System.out.println(ConsoleColors.RED_BOLD + "ID de sala inválido. Debe ser un número entero." + ConsoleColors.RESET);
                 }
                 break;
             case 3:
@@ -302,6 +300,8 @@ public class MeetingRoomMain {
                     }
                 } catch (SQLException e) {
                     System.out.println(ConsoleColors.RED_BOLD + "Error al obtener la sala: " + e.getMessage() + ConsoleColors.RESET);
+                }  catch (NumberFormatException e) {
+                    System.out.println(ConsoleColors.RED_BOLD + "ID de sala inválido. Debe ser un número entero." + ConsoleColors.RESET);
                 }
                 break;
             case 4:
@@ -338,7 +338,7 @@ public class MeetingRoomMain {
 
     private static void showMainMenu() {
         System.out.println(ConsoleColors.BLUE_BOLD_BRIGHT +
-                "╔══════════════════════════════════════════════╗\n" +
+                "\n╔══════════════════════════════════════════════╗\n" +
                 "║                  MENÚ                        ║\n" +
                 "╠══════════════════════════════════════════════╣\n" +
                 "║  0. Salir del programa                       ║\n" +
