@@ -19,6 +19,11 @@ public class MeetingRoomManager {
         this.employeeDAO = new EmployeeDAO();
     }
 
+    public Optional<Employee> getEmployeeByDni(String dni) throws SQLException {
+        // Obtener un empleado por su DNI
+        return employeeDAO.getEmployeeByDni(dni);
+    }
+
     public Optional<Room> getRoomById(int roomId) throws SQLException {
         // Obtener una sala de reuniones por su ID
         return roomDAO.getRoomById(roomId);

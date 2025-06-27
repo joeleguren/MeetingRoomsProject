@@ -1,10 +1,12 @@
 package view;
 
 import controller.MeetingRoomManager;
+import model.Employee;
 import model.Room;
 import utils.ConsoleColors;
 
 import java.sql.SQLException;
+import java.util.Optional;
 import java.util.Scanner;
 
 public class MeetingRoomMain {
@@ -52,9 +54,17 @@ public class MeetingRoomMain {
                 } while (subOption != MeetingRoomMain.EXIT_OPTION); // Bucle para gestionar las opciones de salas
                 break;
             case 2:
-                // Aquí puedes implementar la lógica para eliminar un empleado
-                System.out.println("Eliminando un empleado...");
-                // mrmanager.deleteEmployee(...);
+                do {
+                    try {
+                        showEmployeeManagementMenu(); // Mostramos el menú de gestión de empleados
+                        System.out.print(ConsoleColors.GREEN_BOLD_BRIGHT +  "Selecciona una opción: " + ConsoleColors.RESET);
+                        subOption = Integer.parseInt(keyboard.nextLine());
+                        // Llamamos al método para gestionar las opciones de empleados
+                    } catch (NumberFormatException e) {
+                        option = -1;
+                    }
+                    manageEmployeeManagementOptions(subOption, mrmanager);
+                } while (subOption != MeetingRoomMain.EXIT_OPTION); // Bucle para gestionar las opciones de salas
                 break;
             case 3:
                 // Aquí puedes implementar la lógica para añadir una sala
@@ -70,6 +80,90 @@ public class MeetingRoomMain {
                 System.out.println(ConsoleColors.RED_BOLD + "Opción no válida. Por favor, intenta de nuevo." + ConsoleColors.RESET + "\n");
         }
     }
+
+    private static void manageEmployeeManagementOptions(int subOption, MeetingRoomManager mrmanager) {
+        Scanner keyboard = new Scanner(System.in); // Scanner para leer los input del usuario
+        String dni;
+        String name;
+        String email;
+        String department;
+
+        switch (subOption) {
+            case 0:
+                System.out.println(ConsoleColors.RED_BOLD + "Volviendo al menú principal..." + ConsoleColors.RESET);
+                break; // Volver al menú principal
+            case 1:
+                System.out.print("Introduce DNI del empleado: ");
+                dni = keyboard.nextLine();
+                System.out.print("Introduce nombre del empleado: ");
+                name = keyboard.nextLine();
+                System.out.print("Introduce email del empleado: ");
+                email = keyboard.nextLine();
+                System.out.print("Introduce departamento del empleado: ");
+                department = keyboard.nextLine();
+
+                try {
+                    Employee newEmployee = new Employee(dni, name, email, department);
+                    if (mrmanager.addEmployee(newEmployee)) {// Llamamos al método para añadir el empleado
+                        System.out.println(ConsoleColors.GREEN_BOLD + "Empleado añadido correctamente." + ConsoleColors.RESET);
+                    } else {
+                        System.out.println(ConsoleColors.RED_BOLD + "Error al añadir el empleado, ya existe un empleado con ese DNI o los datos introducidos son inválidos." + ConsoleColors.RESET);
+                    }
+                } catch (SQLException e) {
+                    System.out.println(ConsoleColors.RED_BOLD + "Error al añadir el empleado: " + e.getMessage() + ConsoleColors.RESET);
+                }
+                break;
+            case 2:
+                System.out.print("Introduce el DNI del empleado que deseas eliminar: ");
+                dni = keyboard.nextLine();
+                try {
+                    if (mrmanager.deleteEmployee(dni)) { // Llamamos al método para eliminar el empleado
+                        System.out.println(ConsoleColors.GREEN_BOLD + "Empleado eliminado correctamente." + ConsoleColors.RESET);
+                    } else {
+                        System.out.println(ConsoleColors.RED_BOLD + "Error al eliminar el empleado, puede que tenga reservas asociadas o no exista." + ConsoleColors.RESET);
+                    }
+                } catch (SQLException e) {
+                    System.out.println(ConsoleColors.RED_BOLD + "Error al eliminar el empleado: " + e.getMessage() + ConsoleColors.RESET);
+                }
+                break;
+            case 3:
+                System.out.print("Introduce el DNI del empleado que deseas modificar: ");
+                dni = keyboard.nextLine();
+                try {
+                    Optional<Employee> employee = mrmanager.getEmployeeByDni(dni); // Llamamos al método para obtener el empleado por DNI
+                    if (employee.isEmpty()) {
+                        System.out.println(ConsoleColors.RED_BOLD + "Empleado no encontrado." + ConsoleColors.RESET);
+                    } else {
+                        System.out.println(employee.get()); // Mostramos los datos del empleado
+                        System.out.print("Introduce el nuevo nombre del empleado: ");
+                        name = keyboard.nextLine();
+                        System.out.print("Introduce el nuevo email del empleado: ");
+                        email = keyboard.nextLine();
+                        System.out.print("Introduce el nuevo departamento del empleado: ");
+                        department = keyboard.nextLine();
+                        Employee modifiedEmployee = new Employee(dni, name, email, department);
+                        if (mrmanager.modifyEmployee(modifiedEmployee)) {
+                            System.out.println(ConsoleColors.GREEN_BOLD + "Empleado modificado correctamente." + ConsoleColors.RESET);
+                        } else {
+                            System.out.println(ConsoleColors.RED_BOLD + "Error al modificar el empleado, puede que los datos introducidos sean inválidos." + ConsoleColors.RESET);
+                        }
+                    }
+                } catch (SQLException e) {
+                    System.out.println(ConsoleColors.RED_BOLD + "Error al obtener el empleado: " + e.getMessage() + ConsoleColors.RESET);
+                }
+                break;
+            case 4:
+                try {
+                    mrmanager.getAllEmployees().forEach(System.out::println); // Llamamos al método para listar todos los empleados
+                } catch (SQLException e) {
+                    System.out.println("Error al listar los empleados: " + e.getMessage());
+                }
+                break;
+            default:
+                System.out.println(ConsoleColors.RED_BOLD + "Opción no válida. Por favor, intenta de nuevo." + ConsoleColors.RESET + "\n");
+        }
+    }
+
 
     private static void manageRoomManagementOptions(int subOption, MeetingRoomManager mrmanager) {
         Scanner keyboard = new Scanner(System.in); // Scanner para leer los input del usuario
@@ -126,11 +220,13 @@ public class MeetingRoomMain {
                 try {
                     System.out.print("Introduce el ID de la sala que deseas modificar: ");
                     roomId = Integer.parseInt(keyboard.nextLine());
-                    System.out.println(mrmanager.getRoomById(roomId));// Llamamos al método para obtener la sala por ID
-                    if (mrmanager.getRoomById(roomId).isEmpty()) {
+                    Optional<Room> room = mrmanager.getRoomById(roomId); // Llamamos al método para obtener la sala por ID
+
+                    if (room.isEmpty()) {
                         System.out.println(ConsoleColors.RED_BOLD + "Sala no encontrada." + ConsoleColors.RESET);
                     }
                     else {
+                        System.out.println(room.get());// Llamamos al método para obtener la sala por ID
                         System.out.print("Introduce el nuevo nombre de la sala: ");
                         roomName = keyboard.nextLine();
                         System.out.print("Introduce la nueva capacidad de la sala: ");
@@ -158,6 +254,16 @@ public class MeetingRoomMain {
             default:
                 System.out.println(ConsoleColors.RED_BOLD + "Opción no válida. Por favor, intenta de nuevo." + ConsoleColors.RESET + "\n");
         }
+    }
+
+    private static void showEmployeeManagementMenu() {
+        System.out.println(ConsoleColors.BLUE_BOLD_BRIGHT +
+                "\n--- Submenú de Gestión de Empleados ---" + ConsoleColors.RESET +
+                "\n  [0] Volver al menú principal" +
+                "\n  [1] Añadir empleado" +
+                "\n  [2] Eliminar empleado" +
+                "\n  [3] Modificar empleado" +
+                "\n  [4] Listar todas los empleados\n");
     }
 
     private static void showRoomManagementMenu() {
