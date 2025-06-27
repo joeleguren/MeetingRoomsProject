@@ -114,7 +114,7 @@ public class MeetingRoomManager {
      */
     public boolean modifyEmployee(Employee employee) throws SQLException {
         // Validar los datos del empleado
-        if (isValidEmployee(employee)) {
+        if (!isValidEmployee(employee)) {
             return false; // Empleado no válido
         }
         return employeeDAO.updateEmployee(employee);
@@ -140,9 +140,9 @@ public class MeetingRoomManager {
      * @return true si la sala es válida, false en caso contrario.
      */
     private static boolean isValidRoom(Room room) {
-        return room != null && room.getRoomId() > 0
-                && room.getCapacity() > 0
-                && !room.getName().isBlank();
+        return room != null && room.getRoomId() > 0 // Comprobamos que el ID de la sala es positivo
+                && room.getCapacity() > 0 // Comprobamos que la capacidad de la sala es positiva
+                && !room.getName().isBlank(); // Comprobamos que el nombre de la sala no esté vacío
     }
 
     /**

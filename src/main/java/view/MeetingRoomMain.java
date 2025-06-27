@@ -120,7 +120,7 @@ public class MeetingRoomMain {
                         java.time.LocalTime.parse(endTime)
                 );
                 // Creamos una nueva reserva
-                Optional<String> reservationId = mrmanager.addReservation(newReservation); // Generamos un ID único para la reserva
+                Optional<String> reservationId = mrmanager.addReservation(newReservation); // Llamamos al método para añadir la reserva
                 if (reservationId.isPresent()) { // Si nos ha devuelto un ID de reserva, es que se ha podido añadir correctamente.
                     System.out.println(ConsoleColors.GREEN_BOLD + "Reserva añadida correctamente. Su código es " + reservationId.get() + ConsoleColors.RESET + ".");
                 } else { // No se ha podido añadir la reserva
